@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Log Analyzer</title>
+<style>
+  body{font-family:Arial,sans-serif;max-width:900px;margin:30px auto;padding:0 15px}
+  form{display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin-bottom:20px}
+  label{display:flex;flex-direction:column;font-size:13px}
+  button{padding:8px 16px;cursor:pointer}
+  table{border-collapse:collapse;width:100%;margin-bottom:20px}
+  th,td{border:1px solid #ccc;padding:6px 10px;text-align:left}
+  th{background:#f0f0f0}
+  h3{margin-bottom:6px}
+</style>
+</head>
+<body>
+<h2>Log Analyzer</h2>
+<form id="f">
+  <label>Log file <input type="file" name="file" required></label>
+  <label>Level
+    <select name="level"><option value="">ALL</option><option>ERROR</option><option>WARN</option><option>INFO</option><option>DEBUG</option><option>FATAL</option></select>
+  </label>
+  <label>Keyword <input type="text" name="keyword"></label>
+  <label>Top N <input type="number" name="top" value="5" min="1" style="width:60px"></label>
+  <button type="submit">Analyze</button>
+</form>
+<div id="out"></div>
+<script>
+function table(title, rows, h1, h2){
+  if(!rows.length) return '';
+  return `<h3>${title}</h3><table><tr><th>${h1}</th><th>${h2}</th></tr>` +
+    rows.map(r=>`<tr><td>${esc(r[0])}</td><td>${r[1]}</td></tr>`).join('') + '</table>';
+}
+function esc(s){return String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+document.getElementById('f').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const out=document.getElementById('out'); out.textContent='Analyzing...';
+  const res=await fetch('/api/logs/analyze',{method:'POST',body:new FormData(e.target)});
+  if(!res.ok){out.textContent='Error: '+res.status;return;}
+  const d=await res.json();
+  out.innerHTML = `<p><b>Total entries:</b> ${d.totalEntries}<br><b>From:</b> ${d.firstTimestamp||'-'} <b>To:</b> ${d.lastTimestamp||'-'}</p>`
+    + table('Level counts', Object.entries(d.levelCounts), 'Level','Count')
+    + table('Top errors', d.topErrors.map(t=>[t.key,t.count]), 'Message','Count')
+    + table('Top exceptions', d.topExceptions.map(t=>[t.key,t.count]), 'Exception','Count')
+    + table('Entries per hour', Object.entries(d.entriesPerHour), 'Hour','Count');
+});
+</script>
+</body>
+</html>

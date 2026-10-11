@@ -1,0 +1,16 @@
+2024-01-15 10:00:01.100 INFO  [main] com.app.Application - Application started
+2024-01-15 10:05:12.200 DEBUG [http-nio-1] com.app.UserService - Fetching user 101
+2024-01-15 10:15:30.300 WARN  [http-nio-2] com.app.CacheService - Cache miss for key 55
+2024-01-15 10:20:45.400 ERROR [http-nio-3] com.app.OrderService - Failed to process order 1001
+java.lang.NullPointerException: Cannot invoke "String.length()" because "s" is null
+    at com.app.OrderService.process(OrderService.java:42)
+    at com.app.OrderController.create(OrderController.java:20)
+2024-01-15 10:45:10.500 ERROR [http-nio-4] com.app.OrderService - Failed to process order 1002
+java.lang.NullPointerException: Cannot invoke "String.length()" because "s" is null
+    at com.app.OrderService.process(OrderService.java:42)
+2024-01-15 11:02:00.600 INFO  [http-nio-1] com.app.UserService - User 102 logged in
+2024-01-15 11:10:20.700 ERROR [http-nio-5] com.app.DbService - Connection failed
+java.sql.SQLException: Connection timed out
+    at com.app.DbService.connect(DbService.java:88)
+2024-01-15 11:30:00.800 WARN  [http-nio-2] com.app.CacheService - Cache miss for key 77
+2024-01-15 12:00:00.900 INFO  [main] com.app.Scheduler - Job completed in 350 ms
